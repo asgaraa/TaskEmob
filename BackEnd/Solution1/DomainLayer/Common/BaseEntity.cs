@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace DomainLayer.Common
 {
-    internal class BaseEntity
+    public class BaseEntity
     {
+        public int Id { get; set; }
+        public bool SoftDelete { get; set; }
+        public DateTime CreatTime { get; set; } = DateTime.Now;
     }
 }
