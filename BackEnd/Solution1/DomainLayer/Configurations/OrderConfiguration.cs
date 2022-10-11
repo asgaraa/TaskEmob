@@ -15,7 +15,6 @@ namespace DomainLayer.Configurations
         {
             builder.Property(m => m.StartTime).IsRequired();
             builder.Property(m => m.CityId).IsRequired();
-            builder.Property(m => m.CountryId).IsRequired();
             builder.Property(m => m.EndTime).IsRequired();
             builder.Property(m => m.Cash).IsRequired();
            

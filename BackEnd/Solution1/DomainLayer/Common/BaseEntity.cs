@@ -10,6 +10,6 @@ namespace DomainLayer.Common
     {
         public int Id { get; set; }
         public bool SoftDelete { get; set; }
-        public DateTime CreatTime { get; set; } = DateTime.Now;
+        public DateTime CreatTime { get; set; } = DateTime.UtcNow;
     }
 }

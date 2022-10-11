@@ -13,12 +13,7 @@ namespace DomainLayer.Entities
         public int Cash { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        public int CountryId { get; set; }
-        public Country Country { get; set; }
         public int CityId { get; set; }
         public City City { get; set; }
-      
-
-
     }
 }
