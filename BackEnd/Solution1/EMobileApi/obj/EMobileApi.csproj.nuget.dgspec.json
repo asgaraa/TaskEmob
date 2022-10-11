@@ -99,9 +99,6 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "C:\\Users\\hp\\Desktop\\TaskEmobile\\BackEnd\\Solution1\\DomainLayer\\DomainLayer.csproj": {
-                "projectPath": "C:\\Users\\hp\\Desktop\\TaskEmobile\\BackEnd\\Solution1\\DomainLayer\\DomainLayer.csproj"
-              },
               "C:\\Users\\hp\\Desktop\\TaskEmobile\\BackEnd\\Solution1\\RepositoryLayer\\RepositoryLayer.csproj": {
                 "projectPath": "C:\\Users\\hp\\Desktop\\TaskEmobile\\BackEnd\\Solution1\\RepositoryLayer\\RepositoryLayer.csproj"
               },

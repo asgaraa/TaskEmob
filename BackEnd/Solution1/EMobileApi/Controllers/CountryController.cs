@@ -48,7 +48,7 @@ namespace EMobileApi.Controllers
         }
 
         [HttpGet]
-        [Route("GetAllCountry")]
+        [Route("GetAllCountryCities")]
         public async Task<IActionResult> GetAllCountryCities([FromBody] CountryEditDto countryEditDto)
         {
             var result = await _service.GetAllCountryCitiesAsync(countryEditDto.Id);
