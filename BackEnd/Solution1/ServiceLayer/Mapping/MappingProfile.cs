@@ -2,6 +2,7 @@
 using DomainLayer.Entities;
 using ServiceLayer.DTOs.CityDto;
 using ServiceLayer.DTOs.CountryDto;
+using ServiceLayer.DTOs.OrderDto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,9 @@ namespace ServiceLayer.Mapping
             CreateMap<City, CityDto>().ReverseMap();
 
             CreateMap<City, CityEditDto>().ReverseMap();
+            CreateMap<Order, OrderDto>().ReverseMap();
+
+            CreateMap<Order, OrderEditDto>().ReverseMap();
         }
    
     }

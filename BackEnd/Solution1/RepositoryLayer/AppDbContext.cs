@@ -22,7 +22,8 @@ namespace RepositoryLayer
      
             modelBuilder.ApplyConfiguration(new CountryConfiguration());
             modelBuilder.ApplyConfiguration(new CityConfiguration());
-     
+            modelBuilder.ApplyConfiguration(new OrderConfiguration());
+
             base.OnModelCreating(modelBuilder);
         }
 
