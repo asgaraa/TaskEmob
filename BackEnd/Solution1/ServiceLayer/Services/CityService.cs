@@ -67,5 +67,12 @@ namespace ServiceLayer.Services
         {
             return _mapper.Map<IEnumerable<CityDto>>(await _repository.FindAllAsync(m => m.Name.Contains(search)));
         }
+
+        public async Task<IEnumerable<CityDto>> GetAllCountryIdAsync(int countryId)
+        {
+            var datas = await _repository.GetCitiesByCountryId(countryId);
+            return _mapper.Map<IEnumerable<CityDto>>(datas);
+        }
+    
     }
 }

@@ -18,5 +18,6 @@ namespace ServiceLayer.Services.Interfaces
         Task<CityDto> GetAsync(int id);
         Task<CityDto> GetByIdAsync(int id);
         Task<IEnumerable<CityDto>> GetAllNameAsync(string name);
+        Task<IEnumerable<CityDto>> GetAllCountryIdAsync(int countryId);                             
     }
 }

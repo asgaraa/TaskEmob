@@ -9,5 +9,6 @@ namespace RepositoryLayer.Repositories.Interfaces
 {
     public interface ICityRepository : IRespository<City>
     {
+        Task<List<City>> GetCitiesByCountryId(int countryId);
     }
 }
