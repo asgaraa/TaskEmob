@@ -10,6 +10,10 @@ function App() {
   const [cash, setCash] = useState();
   const [startTime, setStartTime] = useState();
   const [endTime, setEndTime] = useState();
+  const [travel, setTravel] = useState();
+  const [totalCash, setTotalCash] = useState();
+  const [totalDay, setTotalDay] = useState();
+  const [totalCountry, setTotalCountry] = useState();
 
 
   useEffect(() => {
@@ -20,6 +24,32 @@ function App() {
       .catch(err => {
         console.log(err);
       })
+
+    axios.get("https://localhost:7244/api/Order/GetAllOrder")
+      .then(res => {
+        setTravel(res.data);
+        let totalc = 0;
+        let totald = 0;
+        res.data.forEach(element => {
+          totalc += element.cash;
+          totald += new Date(element.endTime) - new Date(element.startTime);
+        });
+        setTotalCash(totalc);
+        setTotalDay(Math.ceil(totald / (1000 * 3600 * 24)));
+
+        const groupByCountry = res.data.groupByToMap(order => {
+          return order.countryId;
+        });
+
+        setTotalCountry(groupByCountry.count());
+
+      }
+      )
+      .catch(err => {
+        console.log(err);
+      }
+      )
+
   }, []);
 
   function handleCountryChange(e) {
@@ -49,6 +79,45 @@ function App() {
 
     axios.post('https://localhost:7244/api/Order/CreateOrder', order)
       .then(res => {
+        if (res.status === 200) {
+          alert("Order created successfully");
+          document.getElementById("close").click();
+          axios.get("https://localhost:7244/api/Order/GetAllOrder")
+            .then(res => {
+              setTravel(res.data);
+              let totalc = 0;
+              let totald = 0;
+              res.data.forEach(element => {
+                totalc += element.cash;
+                totald += new Date(element.endTime) - new Date(element.startTime);
+              });
+              setTotalCash(totalc);
+              setTotalDay(Math.ceil(totald / (1000 * 3600 * 24)));
+            })
+            .catch(err => {
+              console.log(err);
+            })
+        }
+      })
+      .catch(err => {
+
+      })
+
+  }
+
+
+  function checkEndTime(e) {
+    if (e.target.value < startTime) {
+      alert("Son tarix baslangic tarixinden kicik ola bilmez");
+    }
+    else {
+      setEndTime(e.target.value);
+    }
+  }
+
+  function deleteOrder(id) {
+    axios.delete('https://localhost:7244/api/Order/DeleteOrder/' + travel.id)
+      .then(res => {
         console.log(res);
       }
       )
@@ -56,9 +125,54 @@ function App() {
         console.log(err);
       }
       )
-
   }
 
+
+  function filterTravlesByCountry(country) {
+    axios.get('https://localhost:7244/api/Order/GetByCountryId/' + country)
+      .then(res => {
+        setTravel(res.data);
+        let total = 0;
+        res.data.forEach(element => {
+          total += element.cash;
+        });
+        setTotalCash(total);
+      })
+      .catch(err => {
+        console.log(err);
+      })
+  }
+
+
+  function sortTravels() {
+    let descorasc = document.getElementById("descorasc").value;
+    let sortby = document.getElementById("sortby").value;
+
+
+    if (descorasc === "asc") {
+      if (sortby === "cash") {
+        let sorted = travel.sort((a, b) => a.cash - b.cash)
+        setTravel(sorted);
+        console.log(travel);
+      }
+      else if (sortby === "day") {
+        setTravel(travel.sort((a, b) => new Date(a.startTime) - new Date(b.startTime)));
+        console.log(travel);
+      }
+    }
+
+    else if (descorasc === "desc") {
+      if (sortby === "cash") {
+        setTravel(travel.sort((a, b) => b.cash - a.cash));
+        console.log(travel);
+      }
+      else if (sortby === "day") {
+        setTravel(travel.sort((a, b) => new Date(b.startTime) - new Date(a.startTime)));
+        console.log(travel);
+      }
+    }
+
+  }
 
   return (
     <div className="App">
@@ -69,7 +183,7 @@ function App() {
           </div>
           <div className="col-3">
             <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-              Launch demo modal
+              Yeni Seyahet
             </button>
 
             <div className="modal fade" id="exampleModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -77,7 +191,7 @@ function App() {
                 <div className="modal-content">
                   <div className="modal-header">
                     <h5 className="modal-title" id="exampleModalLabel">Modal title</h5>
-                    <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" id='close' className="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
                   </div>
@@ -113,7 +227,7 @@ function App() {
                       </div>
                       <div className="col-6">
                         <h5>Bitme tarixi</h5>
-                        <input type="date" className="form-control" id="exampleFormControlInput1" onChange={(e) => setEndTime(e.target.value)} />
+                        <input type="date" className="form-control" id="exampleFormControlInput1" onChange={(e) => checkEndTime(e)} />
                       </div>
                     </div>
                     <div className="row">
@@ -135,29 +249,32 @@ function App() {
         </div>
         <div className="row d-flex justify-content-between">
           <div className="col-4">
-            <select className="form-select float-left" defaultValue={"0"}>
-              <option value={"0"}>Open this select menu</option>
-              <option value="1">One</option>
-              <option value="2">Two</option>
-              <option value="3">Three</option>
+            <select className="form-select float-left" defaultValue={"0"} onChange={(e) => filterTravlesByCountry(e.target.value)}>
+              <option value="0" disabled>Olke secin</option>
+              {country && country.map((item, index) => {
+                return (
+                  <option key={index} value={item.id}>{item.name}</option>
+                )
+              })}
+
             </select>
           </div>
           <div className="col-3 float-right">
             <div className="row">
               <div className="col-4">
-                <select className="form-select float-left" aria-label="Default select example">
-                  <option value="0">Gun</option>
-                  <option value="1">Qiymet</option>
+                <select className="form-select float-left" id='sortby' aria-label="Default select example">
+                  <option value="day">Gun</option>
+                  <option value="cash">Qiymet</option>
                 </select>
               </div>
               <div className="col-4">
-                <select className="form-select float-left" aria-label="Default select example">
-                  <option value="0">Artan</option>
-                  <option value="1">Azalan</option>
+                <select className="form-select float-left" id='descorasc' aria-label="Default select example">
+                  <option value="asc">Artan</option>
+                  <option value="desc">Azalan</option>
                 </select>
               </div>
               <div className="col-4">
-                <button>Sirala</button>
+                <button onClick={() => sortTravels()}>Sirala</button>
               </div>
             </div>
           </div>
@@ -178,6 +295,28 @@ function App() {
               </thead>
               <tbody>
 
+                {travel && travel.map((item, index) => {
+                  return (
+                    <tr key={index}>
+                      <th scope="row">{index + 1}</th>
+                      <td>{item?.city?.country.name}</td>
+                      <td>{item?.city?.name}</td>
+                      <td>{item?.startTime}</td>
+                      <td>{item?.endTime}</td>
+                      <td>{item?.cash}</td>
+                      <td>
+                        <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                          Edit
+                        </button>
+                        <button type="button" className="btn btn-danger" onClick={() => deleteOrder(item.id)}>
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
+
+
               </tbody>
             </table>
           </div>
@@ -185,17 +324,14 @@ function App() {
         <div className="row">
           <div className="col-3">
             <div className="row">
-              <p >Olke Sayi</p>
+              <p >Olke Sayi {totalCountry}</p>
             </div>
             <div className="row">
-              <p>Serf olunan gun</p>
+              <p>Serf olunan gun {totalDay}</p>
             </div>
             <div className="row">
-              <p>Serf olunan mebleg</p>
+              <p>Serf olunan mebleg {totalCash}</p>
             </div>
-
-
-
           </div>
         </div>
       </div>

@@ -15,9 +15,11 @@ namespace ServiceLayer.Services.Interfaces
 
         Task UpdateAsync(int Id, OrderEditDto orderEditDto);
         Task DeleteAsync(int id);
-        Task<List<OrderDto>> GetAllAsync();
+        Task<List<OrderGetDto>> GetAllAsync();
         Task<OrderDto> GetAsync(int id);
         Task<OrderDto> GetByIdAsync(int id);
+
+        Task<List<OrderGetDto>> GetByCountryIdAsync(int countryId);
 
 
         //Task<IEnumerable<OrderDto>> GetAllNameAsync(string name);

@@ -25,6 +25,7 @@ namespace ServiceLayer.Mapping
             CreateMap<Order, OrderDto>().ReverseMap();
 
             CreateMap<Order, OrderEditDto>().ReverseMap();
+            CreateMap<Order, OrderGetDto>().ReverseMap();
         }
    
     }

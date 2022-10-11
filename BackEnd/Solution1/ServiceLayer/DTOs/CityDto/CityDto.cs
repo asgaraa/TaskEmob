@@ -10,5 +10,6 @@ namespace ServiceLayer.DTOs.CityDto
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public CountryDto.CountryDto Country { get; set; }
     }
 }

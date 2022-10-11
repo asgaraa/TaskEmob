@@ -56,6 +56,14 @@ namespace EMobileApi.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        [Route("GetByCountryId/{countryId}")]
+        public async Task<IActionResult> GetByCountryId([FromRoute] int countryId)
+        {
+            var result = await _service.GetByCountryIdAsync(countryId);
+            return Ok(result);
+        }
+
         //[HttpGet]
         //[Route("GetByCateId/{id}")]
         //public async Task<IActionResult> GetByCateId([FromRoute] int id)

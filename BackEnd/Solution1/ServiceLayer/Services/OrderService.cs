@@ -36,10 +36,10 @@ namespace ServiceLayer.Services
             await _repository.DeleteAsync(country);
         }
 
-        public async Task<List<OrderDto>> GetAllAsync()
+        public async Task<List<OrderGetDto>> GetAllAsync()
         {
-            var model = await _repository.GetAllAsync();
-            var res = _mapper.Map<List<OrderDto>>(model);
+            var model = await _repository.GetAllByCities();
+            var res = _mapper.Map<List<OrderGetDto>>(model);
             return res;
         }
 
@@ -70,6 +70,14 @@ namespace ServiceLayer.Services
             var model = await _repository.GetAsync(id);
             var res = _mapper.Map<OrderDto>(model);
             return res;
+        }
+
+        public async Task<List<OrderGetDto>> GetByCountryIdAsync(int countryId)
+        {
+            var datas = await _repository.FindOrderByCountry(x => x.City.Country.Id == countryId);
+            var res = _mapper.Map<List<OrderGetDto>>(datas);
+            return res;
+
         }
         //public async Task<IEnumerable<OrderDto>> GetAllNameAsync(string search)
         //{
