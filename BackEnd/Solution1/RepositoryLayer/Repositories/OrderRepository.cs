@@ -23,6 +23,7 @@ namespace RepositoryLayer.Repositories
         {
             var data = await orders
                 .Where(predicate)
+                .Where(m => m.SoftDelete == false)
                 .Include(x => x.City)
                 .Include(x => x.City.Country)
                 .ToListAsync();
@@ -32,6 +33,7 @@ namespace RepositoryLayer.Repositories
         public Task<List<Order>> GetAllByCities()
         {
             var data = orders
+                .Where(m => m.SoftDelete == false)
                 .Include(x => x.City)
                 .ThenInclude(x => x.Country)
                 .ToListAsync();

@@ -22,7 +22,7 @@ namespace ServiceLayer.Services.Interfaces
         Task<List<OrderGetDto>> GetByCountryIdAsync(int countryId);
 
 
-        //Task<IEnumerable<OrderDto>> GetAllNameAsync(string name);
+     
 
     }
 }

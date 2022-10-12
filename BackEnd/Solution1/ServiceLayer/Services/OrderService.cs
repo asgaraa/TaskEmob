@@ -79,9 +79,6 @@ namespace ServiceLayer.Services
             return res;
 
         }
-        //public async Task<IEnumerable<OrderDto>> GetAllNameAsync(string search)
-        //{
-        //    return _mapper.Map<IEnumerable<OrderDto>>(await _repository.FindAllAsync(m => m.Countries.Contains(search)));
-        //}
+     
     }
 }

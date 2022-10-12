@@ -116,9 +116,11 @@ function App() {
   }
 
   function deleteOrder(id) {
-    axios.delete('https://localhost:7244/api/Order/DeleteOrder/' + travel.id)
+    console.log(id);
+    axios.delete('https://localhost:7244/api/Order/DeleteOrder/' +id)
       .then(res => {
         console.log(res);
+        window.location.reload();
       }
       )
       .catch(err => {
@@ -305,7 +307,7 @@ function App() {
                       <td>{item?.endTime}</td>
                       <td>{item?.cash}</td>
                       <td>
-                        <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                        <button type="button" className="btn btn-primary"  data-toggle="modal" data-target="#exampleModal">
                           Edit
                         </button>
                         <button type="button" className="btn btn-danger" onClick={() => deleteOrder(item.id)}>
