@@ -5,8 +5,8 @@ function App() {
 
   const [country, setCountry] = useState();
   const [city, setCity] = useState();
-  const [countryId, setCountryId] = useState();
-  const [cityId, setCityId] = useState();
+  const [countryId, setCountryId] = useState(0);
+  const [cityId, setCityId] = useState(0);
   const [cash, setCash] = useState();
   const [startTime, setStartTime] = useState();
   const [endTime, setEndTime] = useState();
@@ -14,6 +14,7 @@ function App() {
   const [totalCash, setTotalCash] = useState();
   const [totalDay, setTotalDay] = useState();
   const [totalCountry, setTotalCountry] = useState();
+  const [orderId, setOrderId] = useState(null);
 
 
   useEffect(() => {
@@ -37,18 +38,11 @@ function App() {
         setTotalCash(totalc);
         setTotalDay(Math.ceil(totald / (1000 * 3600 * 24)));
 
-        const groupByCountry = res.data.groupByToMap(order => {
-          return order.countryId;
-        });
 
-        setTotalCountry(groupByCountry.count());
-
-      }
-      )
+      })
       .catch(err => {
         console.log(err);
-      }
-      )
+      })
 
   }, []);
 
@@ -68,41 +62,80 @@ function App() {
     setCityId(e.target.value);
   }
 
-  function createOrder() {
-    let order = {
-      cash: cash,
-      countryId: countryId,
-      cityId: cityId,
-      startTime: startTime,
-      endTime: endTime
+  function putOrder() {
+    if (orderId == null) {
+      let order = {
+        cash: cash,
+        countryId: countryId,
+        cityId: cityId,
+        startTime: startTime,
+        endTime: endTime
+      }
+
+      axios.post('https://localhost:7244/api/Order/CreateOrder', order)
+        .then(res => {
+          if (res.status === 200) {
+            alert("Order created successfully");
+            document.getElementById("close").click();
+            axios.get("https://localhost:7244/api/Order/GetAllOrder")
+              .then(res => {
+                setTravel(res.data);
+                let totalc = 0;
+                let totald = 0;
+                res.data.forEach(element => {
+                  totalc += element.cash;
+                  totald += new Date(element.endTime) - new Date(element.startTime);
+                });
+                setTotalCash(totalc);
+                setTotalDay(Math.ceil(totald / (1000 * 3600 * 24)));
+                setOrderId(null);
+              })
+              .catch(err => {
+                console.log(err);
+              })
+          }
+        })
+        .catch(err => {
+
+        })
+
+    } else {
+      let order = {
+        id: orderId,
+        cash: cash,
+        countryId: countryId,
+        cityId: cityId,
+        startTime: startTime,
+        endTime: endTime
+      }
+
+      axios.put('https://localhost:7244/api/Order/UpdateOrder', order)
+        .then(res => {
+          if (res.status === 200) {
+            alert("Order updated successfully");
+            document.getElementById("close").click();
+            axios.get("https://localhost:7244/api/Order/GetAllOrder")
+              .then(res => {
+                setTravel(res.data);
+                let totalc = 0;
+                let totald = 0;
+                res.data.forEach(element => {
+                  totalc += element.cash;
+                  totald += new Date(element.endTime) - new Date(element.startTime);
+                });
+                setTotalCash(totalc);
+                setTotalDay(Math.ceil(totald / (1000 * 3600 * 24)));
+                setOrderId(null);
+              })
+              .catch(err => {
+                console.log(err);
+              })
+          }
+        })
+        .catch(err => {
+
+        })
     }
-
-    axios.post('https://localhost:7244/api/Order/CreateOrder', order)
-      .then(res => {
-        if (res.status === 200) {
-          alert("Order created successfully");
-          document.getElementById("close").click();
-          axios.get("https://localhost:7244/api/Order/GetAllOrder")
-            .then(res => {
-              setTravel(res.data);
-              let totalc = 0;
-              let totald = 0;
-              res.data.forEach(element => {
-                totalc += element.cash;
-                totald += new Date(element.endTime) - new Date(element.startTime);
-              });
-              setTotalCash(totalc);
-              setTotalDay(Math.ceil(totald / (1000 * 3600 * 24)));
-            })
-            .catch(err => {
-              console.log(err);
-            })
-        }
-      })
-      .catch(err => {
-
-      })
-
   }
 
 
@@ -117,7 +150,7 @@ function App() {
 
   function deleteOrder(id) {
     console.log(id);
-    axios.delete('https://localhost:7244/api/Order/DeleteOrder/' +id)
+    axios.delete('https://localhost:7244/api/Order/DeleteOrder/' + id)
       .then(res => {
         console.log(res);
         window.location.reload();
@@ -155,26 +188,47 @@ function App() {
       if (sortby === "cash") {
         let sorted = travel.sort((a, b) => a.cash - b.cash)
         setTravel(sorted);
-        console.log(travel);
       }
       else if (sortby === "day") {
         setTravel(travel.sort((a, b) => new Date(a.startTime) - new Date(b.startTime)));
-        console.log(travel);
       }
     }
 
     else if (descorasc === "desc") {
       if (sortby === "cash") {
         setTravel(travel.sort((a, b) => b.cash - a.cash));
-        console.log(travel);
       }
       else if (sortby === "day") {
         setTravel(travel.sort((a, b) => new Date(b.startTime) - new Date(a.startTime)));
-        console.log(travel);
       }
     }
 
+  
+
+    
+
+    //append to table
+    let table = document.getElementById("table");
+    table.innerHTML = "";
+    let index=1;
+    travel.forEach(item => {
+      table.innerHTML += `<th scope="row">${index + 1}</th>
+      <td>${item?.city?.country.name}</td>
+      <td>${item?.city?.name}</td>
+      <td>${item?.startTime}</td>
+      <td>${item?.endTime}</td>
+      <td>${item?.cash}</td>`
+      index++;
+    });
+
+
   }
+
+
+
+
+
+
 
   return (
     <div className="App">
@@ -201,7 +255,7 @@ function App() {
                     <div className="row">
                       <div className="col-6">
                         <h5>Olke</h5>
-                        <select className="form-select" defaultValue={"0"} onChange={(e) => handleCountryChange(e)}>
+                        <select className="form-select" defaultValue={countryId} onChange={(e) => handleCountryChange(e)}>
                           <option value="0" disabled>Olke secin</option>
                           {country && country.map((item, index) => {
                             return (
@@ -212,7 +266,7 @@ function App() {
                       </div>
                       <div className="col-6">
                         <h5>Seher</h5>
-                        <select className="form-select" defaultValue={"0"} onChange={(e) => handleCityChange(e)}>
+                        <select className="form-select" defaultValue={cityId} onChange={(e) => handleCityChange(e)}>
                           <option value="0" disabled>Seher secin</option>
                           {city && city.map((item, index) => {
                             return (
@@ -225,24 +279,24 @@ function App() {
                     <div className="row">
                       <div className="col-6">
                         <h5>Baslama tarixi</h5>
-                        <input type="date" className="form-control" id="exampleFormControlInput1" onChange={(e) => setStartTime(e.target.value)} />
+                        <input type="date" className="form-control" id="exampleFormControlInput1" defaultValue={startTime} onChange={(e) => setStartTime(e.target.value)} />
                       </div>
                       <div className="col-6">
                         <h5>Bitme tarixi</h5>
-                        <input type="date" className="form-control" id="exampleFormControlInput1" onChange={(e) => checkEndTime(e)} />
+                        <input type="date" className="form-control" id="exampleFormControlInput1" defaultValue={endTime} onChange={(e) => checkEndTime(e)} />
                       </div>
                     </div>
                     <div className="row">
                       <div className="col-6">
                         <h5>Istifade olunan mebleg</h5>
-                        <input type="number" className="form-control" id="exampleFormControlInput1" onChange={(e) => setCash(e.target.value)} />
+                        <input type="number" className="form-control" id="exampleFormControlInput1" defaultValue={cash} onChange={(e) => setCash(e.target.value)} />
                       </div>
                     </div>
 
                   </div>
                   <div className="modal-footer">
                     <button type="button" className="btn btn-secondary" data-dismiss="modal">Imtina</button>
-                    <button type="button" className="btn btn-primary" onClick={() => createOrder()}>Yaddas</button>
+                    <button type="button" className="btn btn-primary" onClick={() => putOrder()}>Yaddas</button>
                   </div>
                 </div>
               </div>
@@ -295,7 +349,7 @@ function App() {
                   <th scope="col">Settings</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id='table'>
 
                 {travel && travel.map((item, index) => {
                   return (
@@ -307,7 +361,7 @@ function App() {
                       <td>{item?.endTime}</td>
                       <td>{item?.cash}</td>
                       <td>
-                        <button type="button" className="btn btn-primary"  data-toggle="modal" data-target="#exampleModal">
+                        <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModal" onClick={() => setOrderId(item.id)}>
                           Edit
                         </button>
                         <button type="button" className="btn btn-danger" onClick={() => deleteOrder(item.id)}>
@@ -317,8 +371,6 @@ function App() {
                     </tr>
                   )
                 })}
-
-
               </tbody>
             </table>
           </div>
